@@ -26,10 +26,58 @@ export class CartService {
     addProduto(produto: ProdutoDTO): Cart {
         let cart = this.getCart();
         let position = cart.items.findIndex(x => x.produto.id == produto.id);
+        // se posicao for igual a -1 e por que o objeto não esta lista
         if (position == -1) {
             cart.items.push({ quantidade: 1, produto: produto });
         }
         this.storage.setCart(cart);
         return cart;
     }
+
+    removeProduto(produto: ProdutoDTO): Cart {
+        let cart = this.getCart();
+        let position = cart.items.findIndex(x => x.produto.id == produto.id);
+        // se posicao for diferente de -1 e por que o objeto esta na lista
+        if (position != -1) {
+            cart.items.splice(position, 1); // o numero 1 indica remoção
+        }
+        this.storage.setCart(cart);
+        return cart;
+    }
+
+    increaseQuantity(produto: ProdutoDTO): Cart {
+        let cart = this.getCart();
+        let position = cart.items.findIndex(x => x.produto.id == produto.id);
+        // se posicao for diferente de -1 e por que o objeto esta na lista
+        if (position != -1) {
+            cart.items[position].quantidade++;
+        }
+        this.storage.setCart(cart);
+        return cart;
+    }
+
+    decreaseQuantity(produto: ProdutoDTO): Cart {
+        let cart = this.getCart();
+        let position = cart.items.findIndex(x => x.produto.id == produto.id);
+        // se posicao for diferente de -1 e por que o objeto esta na lista
+        if (position != -1) {
+            cart.items[position].quantidade--;
+            if (cart.items[position].quantidade < 1) {
+                cart = this.removeProduto(produto);
+            }
+        }
+        this.storage.setCart(cart);
+        return cart;
+    }
+
+    total() : number {
+        let cart = this.getCart();
+        let sum = 0;
+        cart.items.forEach(item => {
+            sum += item.produto.preco * item.quantidade;
+        })
+
+        return sum;
+    }
+
 }
